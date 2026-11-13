@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Verenas Countdown</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#a98bff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Countdown">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --ink: #1b1464; --pink: #ff3fd0; --cyan: #35f0ff; --lime: #b6ff3b; --violet: #7a3cff; --sun: #ffe600;
+    --font: "Trebuchet MS", "Arial Rounded MT Bold", Verdana, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    min-height: 100vh; min-height: 100dvh; font-family: var(--font); color: var(--ink);
+    background:
+      radial-gradient(rgba(255,255,255,.35) 1.5px, transparent 2px) 0 0 / 18px 18px,
+      linear-gradient(135deg, #ff8ae2, #a98bff 35%, #6ee7ff 68%, #d4ff6a, #ff8ae2) 0 0 / 300% 300%;
+    animation: shift 16s ease-in-out infinite;
+    -webkit-font-smoothing: antialiased;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  @keyframes shift { 0%,100% { background-position: 0 0, 0% 50%; } 50% { background-position: 0 0, 100% 50%; } }
+
+  .ticker { overflow: hidden; white-space: nowrap; background: var(--ink); color: #fff; font-weight: 700; font-size: .78rem; letter-spacing: .12em; padding: 6px 0; position: relative; z-index: 2; }
+  .track { display: inline-block; animation: slide 26s linear infinite; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  #sparkles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  #sparkles span { position: absolute; animation: twinkle 3.2s ease-in-out infinite; text-shadow: 0 0 8px rgba(255,255,255,.9); }
+  @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.7) rotate(0); } 50% { opacity: 1; transform: scale(1.15) rotate(25deg); } }
+
+  main { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 18px 16px 40px; text-align: center; }
+  .logo { font-size: 1.7rem; font-weight: 900; margin: 6px 0 4px; color: #fff; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--pink), 5px 5px 0 var(--ink); letter-spacing: .02em; }
+  .badge { display: inline-block; margin: 8px 0 16px; padding: 5px 14px; font-size: .8rem; font-weight: 800; background: var(--sun); border: 2.5px solid var(--ink); border-radius: 99px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-2deg); }
+
+  .win { background: #fff; border: 3px solid var(--ink); border-radius: 14px; box-shadow: 7px 7px 0 var(--ink); overflow: hidden; margin-bottom: 22px; text-align: center; }
+  .tb { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; color: #fff; font-weight: 800; font-size: .85rem; background: linear-gradient(90deg, #3a2bff, var(--pink)); border-bottom: 3px solid var(--ink); }
+  .ctl { display: flex; gap: 5px; }
+  .ctl i { width: 18px; height: 18px; line-height: 14px; font-style: normal; font-size: .75rem; background: #fff; color: var(--ink); border: 2px solid var(--ink); border-radius: 5px; }
+  .wb { padding: 18px 18px 20px; }
+  .counter .wb { background: linear-gradient(180deg, #b9f4ff, #e3c9ff 60%, #ffc2f0); }
+
+  .eyebrow { font-size: 1.05rem; font-weight: 800; margin: 0; }
+  .count { font-size: clamp(5.5rem, 28vw, 8.5rem); font-weight: 900; line-height: 1.05; margin: 2px 0 0; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 5px 5px 0 var(--pink), 9px 9px 0 var(--ink); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; font-variant-numeric: tabular-nums; }
+  .count.word { font-size: clamp(3rem, 15vw, 5rem); line-height: 1.25; }
+  .unit { font-size: 1.05rem; font-weight: 800; margin: 8px 0 14px; }
+  .bar { height: 22px; border: 3px solid var(--ink); border-radius: 8px; background: #fff; padding: 2px; max-width: 400px; margin: 0 auto; }
+  .bar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--pink), var(--sun), var(--cyan)); -webkit-mask: repeating-linear-gradient(90deg, #000 0 10px, transparent 10px 13px); mask: repeating-linear-gradient(90deg, #000 0 10px, transparent 10px 13px); transition: width .8s ease; }
+  .meta { font-size: .82rem; font-weight: 700; margin: 10px 0 0; }
+
+  .dateLabel { font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--violet); margin: 0 0 10px; }
+  .quote { margin: 0; font-size: 1.3rem; font-weight: 700; line-height: 1.45; text-wrap: balance; }
+  .src { font-size: .72rem; font-style: italic; color: #5b52a8; margin: 14px 0 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+
+  button { font: inherit; font-size: .88rem; font-weight: 800; color: var(--ink); cursor: pointer; padding: 8px 16px; border: 2.5px solid var(--ink); border-radius: 99px; box-shadow: 0 4px 0 var(--ink); background: linear-gradient(#fff 0%, #ffd9f6 48%, #ff8ee3 52%, var(--pink) 100%); -webkit-tap-highlight-color: transparent; transition: transform .08s, box-shadow .08s; }
+  button.alt { background: linear-gradient(#fff 0%, #d6fbff 48%, #7ff3ff 52%, var(--cyan) 100%); }
+  button.lime { background: linear-gradient(#fff 0%, #f1ffd0 48%, #d6ff7a 52%, var(--lime) 100%); }
+  button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  button:disabled { opacity: .4; cursor: default; }
+  button:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: linear-gradient(#fff 0%, #ffe9a0 48%, #ffd23c 52%, var(--sun) 100%); }
+  nav { display: flex; gap: 10px; justify-content: center; margin: 4px 0 8px; }
+  footer { font-size: .78rem; font-weight: 700; color: var(--ink); margin-top: 18px; }
+
+  #fx { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  #toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 30px); opacity: 0; z-index: 30; background: var(--ink); color: #fff; font-weight: 800; padding: 10px 18px; border-radius: 99px; transition: .25s; pointer-events: none; }
+  #toast.on { transform: translate(-50%, 0); opacity: 1; }
+
+  dialog { border: 3px solid var(--ink); border-radius: 14px; box-shadow: 7px 7px 0 var(--ink); padding: 0; width: min(520px, 92vw); max-height: 82vh; color: var(--ink); font-family: var(--font); }
+  dialog::backdrop { background: rgba(27,20,100,.55); }
+  dialog .body { padding: 14px 16px 16px; overflow-y: auto; max-height: calc(82vh - 46px); }
+  .fav { border: 2.5px solid var(--ink); border-radius: 12px; padding: 12px; margin-bottom: 12px; background: #fff8fe; }
+  .fav .d { font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--violet); margin: 0 0 6px; }
+  .fav .t { margin: 0; font-weight: 700; line-height: 1.4; }
+  .fav .s { margin: 8px 0 0; font-size: .7rem; font-style: italic; color: #5b52a8; }
+  .fav .row { display: flex; gap: 8px; margin-top: 10px; }
+  .fav .row button { font-size: .75rem; padding: 5px 12px; }
+  .empty { text-align: center; font-weight: 700; padding: 18px 6px; }
+
+  @media (prefers-reduced-motion: reduce) { body, .track, #sparkles span { animation: none !important; } .bar span { transition: none; } }
+</style>
+</head>
+<body>
+<div class="ticker" aria-hidden="true"><div class="track">
+  <span>✦ DU SCHAFFST DAS ✦ FLUMMI POWER ✦ BALD IST ES SO WEIT ✦ TAG FÜR TAG ZUM ZIEL ✦ SHINE BRIGHT, VERENA ✦ DU SCHAFFST DAS ✦ FLUMMI POWER ✦ BALD IST ES SO WEIT ✦ TAG FÜR TAG ZUM ZIEL ✦ SHINE BRIGHT, VERENA ✦ </span><span>✦ DU SCHAFFST DAS ✦ FLUMMI POWER ✦ BALD IST ES SO WEIT ✦ TAG FÜR TAG ZUM ZIEL ✦ SHINE BRIGHT, VERENA ✦ DU SCHAFFST DAS ✦ FLUMMI POWER ✦ BALD IST ES SO WEIT ✦ TAG FÜR TAG ZUM ZIEL ✦ SHINE BRIGHT, VERENA ✦ </span>
+</div></div>
+<div id="sparkles" aria-hidden="true"></div>
+
+<main>
+  <h1 class="logo">✦ Verenas Countdown ✦</h1>
+  <div class="badge" id="badge">★ Flummi-Tag! ★</div>
+
+  <section class="win counter">
+    <div class="tb"><span>countdown.exe</span><span class="ctl" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span></div>
+    <div class="wb">
+      <p class="eyebrow" id="eyebrow">Noch</p>
+      <div class="count" id="count" role="img" aria-label="Verbleibende Tage" title="Tippen für Flummis">–</div>
+      <p class="unit" id="unit"></p>
+      <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="barfill"></span></div>
+      <p class="meta" id="meta"></p>
+    </div>
+  </section>
+
+  <section class="win" aria-live="polite">
+    <div class="tb"><span>spruch_des_tages.txt</span><span class="ctl" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span></div>
+    <div class="wb">
+      <p class="dateLabel" id="dateLabel"></p>
+      <blockquote class="quote" id="quote"></blockquote>
+      <p class="src" id="src" hidden></p>
+      <div class="actions">
+        <button id="fav" type="button" aria-pressed="false">♡ Merken</button>
+        <button id="share" type="button" class="alt">▣ Als Bild</button>
+        <button id="favsOpen" type="button" class="lime">Favoriten (0)</button>
+      </div>
+    </div>
+  </section>
+
+  <nav aria-label="Sprüche durchblättern">
+    <button id="prev" type="button">← Gestern</button>
+    <button id="now" type="button" hidden>Heute</button>
+    <button id="next" type="button">Weiter →</button>
+    <button id="flummiBtn" type="button" class="alt">Flummis!</button>
+  </nav>
+
+  <footer>Letzter Arbeitstag: Freitag, 30. April 2027</footer>
+</main>
+
+<canvas id="fx"></canvas>
+<div id="toast" role="status"></div>
+
+<dialog id="favsDialog" aria-label="Gemerkte Sprüche">
+  <div class="tb"><span>meine_favoriten.exe</span><button id="favsClose" type="button" style="padding:1px 10px;font-size:.75rem;box-shadow:0 2px 0 var(--ink)">Schließen ×</button></div>
+  <div class="body" id="favsList"></div>
+</dialog>
+
+<script src="sprueche.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
